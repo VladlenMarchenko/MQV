@@ -1,7 +1,7 @@
 services:
   queuemail:
     build: .
-    image: queuemail:latest
+    image: "${QUEUEMAIL_IMAGE:-queuemail:latest}"
     container_name: queuemail
     ports:
       - "8000:8000"
