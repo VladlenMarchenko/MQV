@@ -1,0 +1,101 @@
+﻿{
+  "comment": "Правила по NP.pdf. Приоритет в коде: delete -> move_with_analysis -> move_if_returned_delete.",
+  "categories": {
+    "move_if_returned_delete": [
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["WSRM"],
+        "max_curdepth": 10,
+        "exclude_keywords": ["DEADLETTER", "ROUTERUNAV", "OW_RESP", "SIGNAL", "TRG", "CALLBACK", "INVOKE", "SBRM_MAIN_POBRESPONSE.OP1.Q.ERR"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["IFPS"],
+        "max_curdepth": 10,
+        "exclude_keywords": ["DEADLETTER", "IFPSSTATUS", "IFPS_STATUS", "SIGNAL", "TRG", "OW_RESP", "CALLBACK", "INVOKE"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["ERR"],
+        "any_keywords": ["IFPSSTATUS", "IFPS_STATUS"],
+        "exclude_keywords": ["SIGNAL", "TRG", "OW_RESP", "CALLBACK", "INVOKE", "DEADLETTER"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["ERR"],
+        "max_curdepth": 10,
+        "exclude_keywords": ["SBRM", "OW_RESP", "SIGNAL", "TRG", "CALLBACK", "INVOKE", "DEADLETTER", "ROUTERUNAV", "IFPSSTATUS", "IFPS_STATUS"]
+      }
+    ],
+    "delete": [
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["OW_RESP"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["SIGNAL"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["TRG"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["SBRM", "ERR"]
+      }
+    ],
+    "move_with_analysis": [
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["CALLBACK"],
+        "exclude_keywords": ["INVOKE"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["INVOKE"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["WSRM"],
+        "min_curdepth": 11,
+        "exclude_keywords": ["ROUTERUNAV", "DEADLETTER", "SIGNAL", "TRG", "OW_RESP"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["IFPS"],
+        "min_curdepth": 11,
+        "exclude_keywords": ["DEADLETTER", "IFPSSTATUS", "IFPS_STATUS", "SIGNAL", "TRG", "OW_RESP"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["ERR"],
+        "min_curdepth": 11,
+        "exclude_keywords": ["SBRM", "OW_RESP", "SIGNAL", "TRG", "CALLBACK", "INVOKE", "IFPSSTATUS", "IFPS_STATUS", "DEADLETTER", "DEAD_LETTER"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["ROUTERUNAV"]
+      },
+      {
+        "mode": "always",
+        "pattern": "",
+        "all_keywords": ["SBRM_MAIN_POBRESPONSE.OP1.Q.ERR"]
+      }
+    ]
+  }
+}

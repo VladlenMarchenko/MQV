@@ -1,0 +1,159 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Генератор письма по очередям</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --accent: #0f766e;
+      --border: #d1d5db;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(140deg, #eef6ff, #f8fafc 45%, #ecfeff);
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+    h1 { margin-top: 0; }
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-size: 14px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    button {
+      margin-top: 12px;
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f8fafc;
+      border: 1px dashed #9ca3af;
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 160px;
+    }
+    .warn { color: #b45309; margin-top: 10px; }
+    .high-volume {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #fef2f2;
+      border: 2px solid #ef4444;
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 80px;
+      color: #991b1b;
+      font-weight: 600;
+      display: none;
+    }
+    .high-volume.visible { display: block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Генератор письма</h1>
+      <p>Вставьте очереди (каждая с новой строки или через <code>, ; </code>), затем нажмите кнопку.</p>
+      <textarea id="queues" placeholder="QUEUE_A&#10;QUEUE_B&#10;QUEUE_C"></textarea>
+      <p><label for="signature"><strong>Подпись</strong> (добавляется в конец письма)</label></p>
+      <textarea id="signature" rows="3" placeholder="Марченко Владлен Витальевич&#10;Ведущий специалист пао Альфа банк"></textarea>
+      <br />
+      <button type="button" id="saveSignatureBtn">Сохранить подпись</button>
+      <button id="generateBtn">Сформировать письмо</button>
+      <div id="warn" class="warn"></div>
+      <h3>Результат</h3>
+      <div id="letter" class="result"></div>
+      <div id="highVolume" class="high-volume"></div>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('generateBtn');
+    const saveSignatureBtn = document.getElementById('saveSignatureBtn');
+    const queuesInput = document.getElementById('queues');
+    const signatureInput = document.getElementById('signature');
+    const letterEl = document.getElementById('letter');
+    const highVolumeEl = document.getElementById('highVolume');
+    const warnEl = document.getElementById('warn');
+
+    fetch('/signature')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.signature) signatureInput.value = data.signature;
+      });
+
+    saveSignatureBtn.addEventListener('click', async () => {
+      await fetch('/signature', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signature: signatureInput.value })
+      });
+      warnEl.textContent = 'Подпись сохранена.';
+    });
+
+    btn.addEventListener('click', async () => {
+      warnEl.textContent = '';
+      letterEl.textContent = 'Формируем...';
+      highVolumeEl.textContent = '';
+      highVolumeEl.classList.remove('visible');
+
+      let data;
+      try {
+        const resp = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queues: queuesInput.value, signature: signatureInput.value })
+        });
+        data = await resp.json();
+        if (!resp.ok) {
+          letterEl.textContent = '';
+          warnEl.textContent = data.error || 'Ошибка сервера';
+          return;
+        }
+      } catch (err) {
+        letterEl.textContent = '';
+        warnEl.textContent = 'Не удалось получить ответ сервера';
+        return;
+      }
+
+      letterEl.textContent = data.letter || '';
+
+      if (data.high_volume_block) {
+        highVolumeEl.textContent = data.high_volume_block;
+        highVolumeEl.classList.add('visible');
+      }
+
+      if (data.unmatched && data.unmatched.length) {
+        warnEl.textContent = 'Внимание: часть очередей не сопоставлена правилам NP: ' + data.unmatched.join(', ');
+      }
+    });
+  </script>
+</body>
+</html>
