@@ -1,0 +1,11 @@
+.git
+.venv
+**/__pycache__
+**/*.pyc
+logs
+release
+build
+dist
+deploy
+NP.pdf
+*.md

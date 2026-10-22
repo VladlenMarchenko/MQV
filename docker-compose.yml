@@ -1,0 +1,18 @@
+services:
+  queuemail:
+    build: .
+    image: queuemail:latest
+    container_name: queuemail
+    ports:
+      - "8000:8000"
+    environment:
+      QUEUEMAIL_DATA: /data
+      QUEUEMAIL_HOST: 0.0.0.0
+      QUEUEMAIL_PORT: "8000"
+    volumes:
+      - queuemail-data:/data
+      - ./np_rules.json:/app/np_rules.json:ro
+    restart: unless-stopped
+
+volumes:
+  queuemail-data:

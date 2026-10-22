@@ -12,7 +12,10 @@ $files = @(
     "requirements.txt",
     "server.json",
     "signature.txt",
-    "README.md"
+    "README.md",
+    "Dockerfile",
+    "docker-compose.yml",
+    ".dockerignore"
 )
 foreach ($name in $files) {
     $src = Join-Path $AppDir $name

@@ -10,7 +10,25 @@ python app.py
 
 Open: <http://127.0.0.1:8000>
 
-This starts the development server on localhost only. On Windows Server use the steps below.
+This starts the development server on localhost only. To publish the site, use Docker or the Windows service below.
+
+## Docker
+
+Нужны Docker Engine и Docker Compose. В каталоге с `docker-compose.yml`:
+
+```powershell
+docker compose up -d --build
+```
+
+Сайт: <http://localhost:8000>
+
+```powershell
+docker compose logs -f
+docker compose restart
+docker compose down
+```
+
+Подпись хранится в томе `queuemail-data` и сохраняется при пересборке образа. Правила читаются из `np_rules.json` рядом с compose-файлом; после правки выполните `docker compose restart`. Другой внешний порт задаётся слева в `ports`, например `"8080:8000"`. Страницы входа нет.
 
 ## Windows Server
 

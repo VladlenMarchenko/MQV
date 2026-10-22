@@ -1,4 +1,5 @@
 ﻿import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -13,8 +14,11 @@ else:
     BASE_DIR = Path(__file__).resolve().parent
     EXE_DIR = BASE_DIR
 
+_data_dir = os.environ.get("QUEUEMAIL_DATA", "").strip()
+DATA_DIR = Path(_data_dir) if _data_dir else EXE_DIR
+
 RULES_PATH = BASE_DIR / "np_rules.json"
-SIGNATURE_PATH = EXE_DIR / "signature.txt"
+SIGNATURE_PATH = DATA_DIR / "signature.txt"
 
 HIGH_VOLUME_THRESHOLD = 20
 

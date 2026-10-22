@@ -8,10 +8,10 @@ from logging.handlers import RotatingFileHandler
 
 from waitress import serve
 
-from app import EXE_DIR, app
+from app import DATA_DIR, EXE_DIR, app
 
 CONFIG_PATH = EXE_DIR / "server.json"
-LOG_DIR = EXE_DIR / "logs"
+LOG_DIR = DATA_DIR / "logs"
 PID_PATH = LOG_DIR / "queuemail.pid"
 
 
@@ -63,7 +63,19 @@ def setup_logging() -> None:
     app.logger.setLevel(logging.INFO)
 
 
+def ensure_data_dir() -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    target = DATA_DIR / "signature.txt"
+    bundled = EXE_DIR / "signature.txt"
+    if target.exists() or not bundled.exists():
+        return
+    if bundled.resolve() == target.resolve():
+        return
+    target.write_text(bundled.read_text(encoding="utf-8"), encoding="utf-8")
+
+
 def main() -> None:
+    ensure_data_dir()
     setup_logging()
     log = logging.getLogger("queuemail")
     config = load_config()
